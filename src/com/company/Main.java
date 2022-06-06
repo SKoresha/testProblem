@@ -1,13 +1,23 @@
 package com.company;
 
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Main {
+    public static int countElementsZero = 0;
+    public static int countElementsOne = 0;
+    public static int countZeroBit = 0;
+    public static int countOneBit = 0;
+
 
     static int countDigitsZero(long number) {
         int zeroCount = 0;
+        if (number == 0) {
+            return 1;
+        }
         while (number >= 1) {
             if (number % 2 == 0) {
                 zeroCount++;
@@ -18,7 +28,7 @@ public class Main {
     }
 
     static int countDigitsOne(long number) {
-        return Integer.bitCount(Math.toIntExact(number));
+        return Long.bitCount(number);
     }
 
     static int countDigits(long number, boolean flag) {
@@ -28,52 +38,64 @@ public class Main {
         return countDigitsZero(number);
     }
 
-    public static int countElementsZero = 0;
-    public static int countElementsOne = 0;
 
     public static void main(String[] args) {
 
-        ConcurrentLinkedDeque<Integer> numList = new ConcurrentLinkedDeque<>();
+        ConcurrentLinkedDeque<Long> numList = new ConcurrentLinkedDeque<>();
 
         Scanner scan = new Scanner(System.in);
         System.out.println("Ввод количества элементов списка: ");
         int arrSize = scan.nextInt();
 
         for (int i = 0; i < arrSize; i++) {
-            numList.add((int) getRandomNumber());
+            numList.add(getRandomNumber());
         }
         System.out.println(numList);
         int size = numList.size();
 
         Thread first_Thread = new Thread(() -> {
             for (int i = 0; i < size; i++) {
-                Integer numPollFirst = numList.pollFirst();
+                Long numPollFirst = numList.pollFirst();
                 if (numPollFirst == null) {
                     break;
                 }
-                System.out.println("Элемент: "+numPollFirst+"\tКоличество нулевых битов: " + countDigits(numPollFirst, false));
+                countZeroBit += countDigits(numPollFirst, false);
                 countElementsZero++;
-                System.out.println("Количество пройденных элементов = " + countElementsZero + " Thread: " + Thread.currentThread().getId());
             }
         });
-        first_Thread.start();
 
         Thread second_Thread = new Thread(() -> {
             for (int i = size - 1; i >= 0; i--) {
-                Integer numPollLast = numList.pollLast();
+                Long numPollLast = numList.pollLast();
                 if (numPollLast == null) {
                     break;
                 }
-                System.out.println("Элемент: "+numPollLast+"\tКоличество единичных битов: " + countDigits(numPollLast, true));
+                countOneBit += countDigits(numPollLast, true);
                 countElementsOne++;
-                System.out.println("Количество пройденных элементов = " + countElementsOne + " Thread: " + Thread.currentThread().getId());
             }
         });
+
+        first_Thread.start();
         second_Thread.start();
+
+        try {
+            first_Thread.join();
+            second_Thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Поток: " + first_Thread.getId() + "\tКоличество пройденных элементов: "
+                + countElementsZero + "\nКоличество нулевых битов: " + countZeroBit);
+        System.out.println("Поток: " + second_Thread.getId() + "\tКоличество пройденных элементов: "
+                + countElementsOne + "\nКоличество единичных битов: " + countOneBit);
+
     }
 
-    public static double getRandomNumber() {
-        return 100 * Math.random();
+    public static long getRandomNumber() {
+        long max2 = 4294967295L;
+        long min = 0;
+        return ThreadLocalRandom.current().nextLong(min, max2);
     }
 
 }
