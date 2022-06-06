@@ -13,6 +13,7 @@ public class Main {
     public static int countOneBit = 0;
 
 
+
     static int countDigitsZero(long number) {
         int zeroCount = 0;
         if (number == 0) {
@@ -50,11 +51,9 @@ public class Main {
         for (int i = 0; i < arrSize; i++) {
             numList.add(getRandomNumber());
         }
-        System.out.println(numList);
-        int size = numList.size();
 
         Thread first_Thread = new Thread(() -> {
-            for (int i = 0; i < size; i++) {
+           while(true){
                 Long numPollFirst = numList.pollFirst();
                 if (numPollFirst == null) {
                     break;
@@ -65,7 +64,7 @@ public class Main {
         });
 
         Thread second_Thread = new Thread(() -> {
-            for (int i = size - 1; i >= 0; i--) {
+            while(true){
                 Long numPollLast = numList.pollLast();
                 if (numPollLast == null) {
                     break;
@@ -89,7 +88,6 @@ public class Main {
                 + countElementsZero + "\nКоличество нулевых битов: " + countZeroBit);
         System.out.println("Поток: " + second_Thread.getId() + "\tКоличество пройденных элементов: "
                 + countElementsOne + "\nКоличество единичных битов: " + countOneBit);
-
     }
 
     public static long getRandomNumber() {
@@ -97,5 +95,4 @@ public class Main {
         long min = 0;
         return ThreadLocalRandom.current().nextLong(min, max2);
     }
-
 }
