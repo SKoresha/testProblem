@@ -15,7 +15,9 @@ public class Main {
 
 
     static int countDigitsZero(long number) {
-        int zeroCount = 0;
+        return Long.SIZE - Long.bitCount(number);
+     /*   int zeroCount = 0;
+
         if (number == 0) {
             return 1;
         }
@@ -25,7 +27,7 @@ public class Main {
             }
             number = number / 2;
         }
-        return zeroCount;
+        return zeroCount;*/
     }
 
     static int countDigitsOne(long number) {
